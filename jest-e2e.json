@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "collectCoverageFrom": ["**/*.(t|j)s"],
+  "moduleNameMapper": {
+    "^@api(|/.*)$": "<rootDir>/apps/api/src/$1",
+    "^@batch(|/.*)$": "<rootDir>/apps/batch/src/$1",
+    "^@app/app-config(|/.*)$": "<rootDir>/libs/app-config/src/$1",
+    "^@app/database(|/.*)$": "<rootDir>/libs/database/src/$1",
+    "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+    "^@app/i18n(|/.*)$": "<rootDir>/libs/i18n/src/$1"
+  }
+}

@@ -1,0 +1,11 @@
+論理エンティティ名,車両マスタ,,,,,,,,,,,,,,
+物理エンティティ名,M_CAR,,,,,,,,,,,,,,
+論理名,車両ID,車両タイプ,車格,車両管理番号,所有会社ID,リース開始日付,リース終了日付,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,CAR_ID,CARTYPE,CARSIZE,CAR_MANAGEMENT_NUM,OWNING_COMPANY_ID,LEASE_START_YMD,LEASE_END_YMD,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*区分値,*区分値,VARCHAR(50),*ID共通,*日付,*日付,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),Yes,Yes,Yes,Yes,,,,,,,,,,
+,1,01,01,R00001,1,,,,,,,,,,
+,2,01,02,R00002,1,2022-01-01,2023-12-31,,,,,,,,
+,3,01,03,R00003,1,,,,,,,,,,
+,4,01,04,R00004,1,,,,,,,,,,
+,5,02,05,R00005,2,,,,,,,,,,

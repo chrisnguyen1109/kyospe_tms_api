@@ -1,0 +1,17 @@
+.dockerignore
+.drone.yaml
+.env_vars
+.env*
+.git
+.gitignore
+.prettierrc
+.scannerwork
+.vscode
+coverage
+dist
+docker-compose.yaml
+Dockerfile
+docs
+node_modules
+README.md
+sonar-project.properties

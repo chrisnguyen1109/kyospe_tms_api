@@ -1,0 +1,8 @@
+論理エンティティ名,運送会社マスタ,,,,,,,,,,,,
+物理エンティティ名,M_TRANSPORT_COMPANY,,,,,,,,,,,,
+論理名,運送会社ID,運送会社名称,電話番号,親会社ID,庸車拠点ID,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,TRANSPORT_COMPANY_ID,TRANSPORT_COMPANY_NM,TEL_NUMBER,PARENT_COMPANY_ID,CARRIAGE_BASE_ID,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*名称,*TEL,*ID共通,*ID共通,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),Yes,,,,,,,,,,,
+,1,関根エンタープライズKPS,04-7198-8682,,,,,,,,,,
+,2,株式会社○○運送,00-1234-5678,1,1,,,,,,,,

@@ -1,0 +1,95 @@
+trigger:
+  - release/v*
+  
+pr: none
+
+pool:
+    vmImage: 'ubuntu-latest'
+
+variables:
+- group: api
+
+stages:
+- stage: set_env
+  condition: eq(variables['Build.Reason'], 'Manual')
+  jobs:
+  - job: set_env_job
+    variables:
+      GIT_COMMIT: $(Build.SourceVersion)
+    steps:
+      - bash: |
+          SHORT_HASH=$(echo $GIT_COMMIT | cut -b -7)
+          SEMANTIC_VERSION=$(grep -m 1 '"version"' package.json  | cut -d'"' -f4)
+          APP_VERSION="v$SEMANTIC_VERSION-$ENVIRONMENT-$SHORT_HASH"
+          
+          DOCKER_IMAGE="$DOCKER_REPO/$APP_NAME:$APP_VERSION"
+
+          export DOCKER_IMAGE=$DOCKER_IMAGE
+          export APP_VERSION=$APP_VERSION 
+
+          echo "##vso[task.setvariable variable=docker_image;isOutput=true]$DOCKER_IMAGE"
+          echo "##vso[task.setvariable variable=app_version;isOutput=true]$APP_VERSION"
+        name: set_env_step
+
+
+- stage: build_push_logout
+  dependsOn: set_env
+  jobs:
+  - job: build_push
+    variables:
+      app_version : $[ stageDependencies.set_env.set_env_job.outputs['set_env_step.app_version'] ]
+      docker_image : $[ stageDependencies.set_env.set_env_job.outputs['set_env_step.docker_image'] ]
+    steps:
+      - bash: |
+          echo "APP_VERSION=$(APP_VERSION)"
+          echo "DOCKER_IMAGE=$(DOCKER_IMAGE)"
+
+          echo "docker build -f ./apps/$APP_NAME/Dockerfile -t $DOCKER_IMAGE ."
+          docker build -f ./apps/$APP_NAME/Dockerfile -t $DOCKER_IMAGE .
+          
+          echo "docker push $DOCKER_IMAGE"
+          docker push $DOCKER_IMAGE
+
+          docker logout $DOCKER_REPO
+        name: build
+
+      - bash: |
+          echo "$DOCKER_AUTH_LOGIN" > $HOME/.docker/config.json
+          echo "docker push $DOCKER_IMAGE"
+          docker push $DOCKER_IMAGE
+        name: push
+        env:
+          DOCKER_AUTH_LOGIN: $(docker_auth_login)
+
+      - bash: |
+          docker logout $DOCKER_REPO
+        name: logout
+
+          
+          
+
+- stage: deploy
+  dependsOn: 
+    - set_env
+    - build_push_logout
+  jobs:
+  - job: deploy 
+    variables:
+      app_version : $[ stageDependencies.set_env.set_env_job.outputs['set_env_step.app_version'] ]
+      docker_image : $[ stageDependencies.set_env.set_env_job.outputs['set_env_step.docker_image'] ]
+    steps:
+      - checkout: none
+      - bash: |
+          echo "APP_VERSION=$(APP_VERSION)"
+          echo "DOCKER_IMAGE=$(DOCKER_IMAGE)"
+
+          echo "az login -u $AZURE_USERNAME -p $AZURE_PASSWORD"
+          az login -u $AZURE_USERNAME -p $AZURE_PASSWORD
+
+          CONTAINER_APP="$PROJECT-$ENVIRONMENT-$APP_NAME"
+
+          echo "az containerapp update --name $CONTAINER_APP --resource-group $RESOURCE_GROUP --image $DOCKER_IMAGE --set-env-vars "VERSION=$APP_VERSION""
+          az containerapp update --name $CONTAINER_APP --resource-group $RESOURCE_GROUP --image $DOCKER_IMAGE --set-env-vars "VERSION=$APP_VERSION"
+        name: deploy
+        env:
+          AZURE_PASSWORD: $(azure_password)

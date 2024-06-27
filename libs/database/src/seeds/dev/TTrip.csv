@@ -1,0 +1,9 @@
+論理エンティティ名,トリップ情報トラン,,,,,,,,,,,,,
+物理エンティティ名,T_TRIP,,,,,,,,,,,,,
+論理名,トリップID,伝票No.,コースシーケンスNo.,運行日付,出発拠点ID,到着拠点ID,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,TRIP_ID,SLIP_NO,COURSE_SEQ_NO,SERVICE_YMD,START_BASE_ID,ARRIVE_BASE_ID,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*No共通,*ID共通,*日付,*ID共通,*ID共通,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),Yes,,,,,,,,,,,,
+,1,JU230029240,1,2023-04-13,1,6,,,,,,,,
+,2,HA230006888,1,2023-04-13,7,1,,,,,,,,
+,3,ZK230001552,1,2023-04-13,1,3,,,,,,,,

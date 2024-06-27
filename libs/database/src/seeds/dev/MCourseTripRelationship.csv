@@ -1,0 +1,10 @@
+論理エンティティ名,コーストリップ紐づけマスタ,,,,,,,,,,,,,
+物理エンティティ名,M_COURSE_TRIP_RELATIONSHIP,,,,,,,,,,,,,
+論理名,コース枠ID,運送会社ID,出発拠点住所1,出発拠点住所2,到着拠点住所1,到着拠点住所2,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,COURSE_ID,TRANSPORT_COMPANY_ID,START_BASE_ADDRESS1,START_BASE_ADDRESS2,ARRIVE_BASE_ADDRESS1,ARRIVE_BASE_ADDRESS2,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*ID共通,*住所,*住所,*住所,*住所,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),,,,,,,,,,,,,
+,1,1,東京都葛飾区,,東京都江東区,,,,,,,,,
+,2,1,東京都葛飾区,,東京都港区,,,,,,,,,
+,3,1,千葉県野田市,,埼玉県越谷市,,,,,,,,,
+,4,1,千葉県野田市,,茨城県取手市,,,,,,,,,

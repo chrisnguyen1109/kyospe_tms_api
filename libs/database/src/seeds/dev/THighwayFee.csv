@@ -1,0 +1,8 @@
+論理エンティティ名,高速道路利用明細トラン,,,,,,,,,,,
+物理エンティティ名,T_HIGHWAY_FEE,,,,,,,,,,,
+論理名,高速利用料金No.,コースシーケンスNo.,支払方法区分,金額,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,HIGHWAY_FEE_NO,COURSE_SEQ_NO,PAYMENT_METHOD_DIV,AMOUNT,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*ID共通,*区分値,*金額,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),,,,,,,,,,,
+,1,1,01,2000,,,,,,,,
+,2,1,02,1000,,,,,,,,

@@ -1,0 +1,109 @@
+import { IsDeleteFlg } from '@app/common/validators/isDeleteFlg.validator';
+import { IsNotEmptyI18n } from '@app/common/validators/isNotEmptyI18n.validator';
+import { IsNumberI18n } from '@app/common/validators/isNumberI18n.validator';
+import { IsStringI18n } from '@app/common/validators/isStringI18n.validator';
+import { MaxLengthI18n } from '@app/common/validators/maxLengthI18n.validator';
+import { MaxNumberLengthI18n } from '@app/common/validators/maxNumberLengthI18n.validator';
+import { IsOptional } from 'class-validator';
+import { CreateSlipDetailIf, SlipDetailIf } from '../if.type';
+import { IsDynamicDecimalI18n } from '@app/common/validators/isDynamicDecimalI18n.validator';
+
+export class CreateOrderDetailIfDto implements CreateSlipDetailIf {
+  @MaxLengthI18n(11, { name: '受注伝票No' })
+  @IsStringI18n({ name: '受注伝票No' })
+  @IsNotEmptyI18n({ name: '受注伝票No' })
+  orderSlipNo: string;
+
+  @MaxNumberLengthI18n(4, { name: 'SeqNo' })
+  @IsNumberI18n({}, { name: 'SeqNo' })
+  @IsNotEmptyI18n({ name: 'SeqNo' })
+  seqNo: number;
+
+  @MaxNumberLengthI18n(3, { name: '受注行No' })
+  @IsNumberI18n({}, { name: '受注行No' })
+  @IsNotEmptyI18n({ name: '受注行No' })
+  orderGyoNo: number;
+
+  @MaxLengthI18n(30, { name: '商品名称' })
+  @IsStringI18n({ name: '商品名称' })
+  @IsOptional()
+  productNm?: string;
+
+  @MaxLengthI18n(43, { name: 'サイズ' })
+  @IsStringI18n({ name: 'サイズ' })
+  @IsOptional()
+  size?: string;
+
+  @MaxNumberLengthI18n(6, { name: '入数' })
+  @IsNumberI18n({}, { name: '入数' })
+  @IsOptional()
+  quantityPerCase?: number;
+
+  @IsDynamicDecimalI18n('10', '2', { name: '受注ケース数量' })
+  @IsOptional()
+  numberOfCase?: string;
+
+  @MaxLengthI18n(4, { name: '受注ケース単位' })
+  @IsStringI18n({ name: '受注ケース単位' })
+  @IsOptional()
+  unitPerCase?: string;
+
+  @IsDynamicDecimalI18n('10', '2', { name: '受注バラ数量' })
+  @IsNotEmptyI18n({ name: '受注バラ数量' })
+  numberOfItem: string;
+
+  @MaxLengthI18n(4, { name: '受注バラ単位' })
+  @IsStringI18n({ name: '受注バラ単位' })
+  @IsOptional()
+  unitPerItem?: string;
+
+  @IsDynamicDecimalI18n('10', '2', { name: '総バラ数量' })
+  @IsNotEmptyI18n({ name: '総バラ数量' })
+  totalNumber: string;
+
+  @MaxLengthI18n(50, { name: '備考テキスト' })
+  @IsStringI18n({ name: '備考テキスト' })
+  @IsOptional()
+  remarks?: string;
+
+  @IsDeleteFlg()
+  deleteFlg: number;
+
+  get slipNo() {
+    return this.orderSlipNo;
+  }
+
+  get gyoNo() {
+    return this.orderGyoNo;
+  }
+
+  toSlipDetail(): SlipDetailIf {
+    return {
+      slipNo: this.orderSlipNo,
+      gyoNo: this.orderGyoNo,
+      productNm: this.productNm,
+      size: this.size,
+      quantityPerCase: this.quantityPerCase,
+      numberOfCases: this.numberOfCase,
+      unitPerCase: this.unitPerCase,
+      numberOfItems: this.numberOfItem,
+      unitPerItem: this.unitPerItem,
+      totalNumber: this.totalNumber,
+      remarks: this.remarks,
+      deleteFlg: !!this.deleteFlg,
+
+      toUpdate() {
+        return {
+          productNm: this.productNm,
+          size: this.size,
+          quantityPerCase: this.quantityPerCase,
+          numberOfCases: this.numberOfCases,
+          unitPerCase: this.unitPerCase,
+          numberOfItems: this.numberOfItems,
+          unitPerItem: this.unitPerItem,
+          totalNumber: this.totalNumber,
+        };
+      },
+    };
+  }
+}

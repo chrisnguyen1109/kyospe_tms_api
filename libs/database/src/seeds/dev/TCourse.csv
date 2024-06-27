@@ -1,0 +1,7 @@
+論理エンティティ名,コース情報トラン,,,,,,,,,,,,,,,,,,,,,,,,,,,
+物理エンティティ名,T_COURSE,,,,,,,,,,,,,,,,,,,,,,,,,,,
+論理名,コースシーケンスNo.,コース枠ID,配車状況区分,配送状況区分,運行日付,開始予定時間,終了予定時間,出発拠点ID,到着拠点ID,運送会社ID,車両ID,配送員ID,実績_開始時間,実績_終了時間,看板写真1,看板写真2,看板写真3,看板写真4,看板写真5,看板写真6,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,COURSE_SEQ_NO,COURSE_ID,DISPATCH_STATUS_DIV,DELIVERY_STATUS_DIV,SERVICE_YMD,START_TIME,END_TIME,START_BASE_ID,ARRIVE_BASE_ID,TRANSPORT_COMPANY_ID,CAR_ID,DIRVER_ID,ACTUAL_START_TIME,ACTUAL_END_TIME,SIGNBOARD_PHOTO_1,SIGNBOARD_PHOTO_2,SIGNBOARD_PHOTO_3,SIGNBOARD_PHOTO_4,SIGNBOARD_PHOTO_5,SIGNBOARD_PHOTO_6,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*ID共通,*区分値,*区分値,*日付,*時間,*時間,*ID共通,*ID共通,*ID共通,*ID共通,*ID共通,*時間,*時間,*画像共通,*画像共通,*画像共通,*画像共通,*画像共通,*画像共通,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,(PK),,,,,,,,,,,,,,,,,,,,,,,,,,,
+,1,1,01,01,2023-04-13,9:00,18:00,1,1,1,1,1,,,,,,,,,,,,,,,,

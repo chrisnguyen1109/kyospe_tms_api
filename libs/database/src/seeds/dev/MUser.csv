@@ -1,0 +1,10 @@
+論理エンティティ名,ユーザマスタ,,,,,,,,,,,,,,,,,
+物理エンティティ名,M_USER,,,,,,,,,,,,,,,,,
+論理名,ユーザマスタID,ユーザID,ユーザ名称,ユーザ名称_かな,メールアドレス,権限区分,パスワード,運送会社ID,メイン拠点ID,配送員ID,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,M_USER_ID,USER_ID,USER_NM,USER_NM_KN,MAIL_ADDRESS,ROLE_DIV,PASSWORD,TRANSPORT_COMPANY_ID,MAIN_BASE_ID,DRIVER_ID,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*メールアドレス,*名称,*名称,メールアドレス,*区分値,*パスワード,*ID共通,*ID共通,*ID共通,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),Yes,Yes,Yes,Yes,Yes,Yes,,,,,,,,,,,
+,1,hiroaki.kuwabara@nevermile.co.jp,桑原裕哲,くわばらひろあき,hiroaki.kuwabara@nevermile.co.jp,01,*****,,,,,,,,,,,
+,2,admin@kyospe.jp,管理者,かんりしゃ,admin@kyospe.jp,02,*****,,,,,,,,,,,
+,3,driver@sekine-ent.jp,ドライバA,どらいばえー,driver@sekine-ent.jp,03,*****,1,1,1,,,,,,,,
+,4,yousha1,傭車ドライバ,ようしゃどらいば,,04,*****,2,1,4,,,,,,,,

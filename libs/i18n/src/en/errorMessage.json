@@ -1,0 +1,99 @@
+{
+  "common": {
+    "COM_COM001_001": "Unexpected error",
+    "COM_COM001_002": "Invalid request",
+    "COM_COM001_003": "Path not found"
+  },
+  "auth": {
+    "COM_CER001_001": "Unauthorized",
+    "COM_CER001_002": "Forbidden",
+    "COM_CER001_003": "Incorrect credentials",
+    "COM_CER002_001": "An account with this email address does not exist"
+  },
+  "user": {
+    "MST_USR003_001": "Failed to get profile",
+    "MST_USR002_001": "Failed to update profile",
+    "MST_USR002_002": "Your current password is incorrect",
+    "MST_USR002_003": "The specified user Id already exists.",
+    "MST_USR002_004": "Failed to create user",
+    "MST_USR002_005": "Failed to update user",
+    "MST_USR002_006": "Failed to delete user",
+    "MST_USR002_007": "Failed to init password",
+    "MST_USR002_008": "The specified email already exists."
+  },
+  "transportCompany": {
+    "MST_TCM002_001": "Failed to create transport company",
+    "MST_TCM002_002": "Failed to update transport company",
+    "MST_TCM002_003": "Failed to delete transport company",
+    "MST_TCM002_004": "It cannot be deleted because there is associated data"
+  },
+  "driver": {
+    "MST_DRV002_001": "Failed to create driver",
+    "MST_DRV002_002": "Failed to update driver",
+    "MST_DRV002_003": "Failed to delete driver"
+  },
+  "car": {
+    "MST_CAR002_001": "Failed to create car",
+    "MST_CAR002_002": "Failed to update car",
+    "MST_CAR002_003": "Failed to delete car"
+  },
+  "if": {
+    "IF_MST001_001": "Schedule mode is running so it cannot be executed",
+    "IF_REQ001_001": "Schedule mode is running so it cannot be executed",
+    "IF_REQ001_002": "Missing {fileType} file",
+    "IF_REQ001_003": "Master base not found on conditions: {conditions}",
+    "IF_REQ001_004": "{key} exist in file {file1} but not in file {file2}",
+    "IF_ESI001_001": "No data found between {lastExecTime} and {thisExecTime}",
+
+    "IS_NOT_EMPTY": "{property} should not be empty",
+    "IS_STRING": "{property} must be string",
+    "MAX_LENGTH": "{property} must be shorter than or equal to {constraints.0} characters",
+    "IS_IN": "{property} must be one of the following values: {values}",
+    "IS_NUMBER": "{property} must be number conforming to the specified constraints",
+    "IS_ENUM": "{property} with value must be one of the following values: {enum}",
+    "IS_YYYYMMDD": "{property} must be valid format date string",
+    "IS_DYNAMIC_DECIMAL": "Invalid decimal format ({precision},{scale})",
+    "INVALID_HEADER": "Invalid {fileType}'s header row",
+    "RECORD_LIMIT": "File record limit exceeded",
+    "MOVE_ERROR": "Unknown error when trying to move blob from {sourceName} to {destinationName}",
+    "DOWNLOAD_ERROR": "Unknown error when trying to download blob {blobName}"
+  },
+  "course": {
+    "TRN_CRS002_001": "Failed to create course frame",
+    "TRN_CRS004_001": "Failed to get course detail",
+    "TRN_CRS005_001": "Failed to assign car and driver",
+    "TRN_CRS010_001": "Failed to update delivery status course",
+    "TRN_CRS013_001": "Failed to get single course detail",
+    "TRN_CRS014_001": "Failed to create course",
+    "TRN_CRS015_001": "Failed to update course",
+    "TRN_CRS016_001": "Failed to update dispatch status course",
+    "TRN_DLV003_001": "Failed to assign spots",
+    "TRN_DLV003_002": "Failed to unassign spots",
+    "TRN_CRS011_005": "Failed to create signboard photo"
+  },
+  "highwayFee": {
+    "TRN_CRS009_001": "Failed to create highway fee",
+    "TRN_CRS009_002": "Failed to update highway fee",
+    "TRN_CRS009_003": "Failed to delete highway fee",
+    "TRN_CRS011_001": "Failed to create receipt image",
+    "TRN_CRS011_002": "Failed to delete receipt image"
+  },
+  "base": {
+    "TRN_REQ005_001": "Failed to update base memo"
+  },
+  "spot": {
+    "TRN_REQ006_001": "Failed to update spot work memo",
+    "TRN_CRS006_001": "Failed to update spot lat lng",
+    "TRN_CRS007_001": "Failed to update spot work status no sign",
+    "TRN_CRS007_002": "Failed to update spot work status sign"
+  },
+  "slip": {
+    "TRN_CRS011_003": "Failed to create delivery image",
+    "TRN_CRS011_004": "Failed to delete delivery image",
+    "TRN_REQ007_001": "Failed to update slip assign memo",
+    "TRN_REQ001_001": "Failed to get slip detail"
+  },
+  "gpsAct": {
+    "TRN_CRS018_001": "Failed to create gps act"
+  }
+}

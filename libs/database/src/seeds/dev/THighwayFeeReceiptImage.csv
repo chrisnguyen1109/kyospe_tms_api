@@ -1,0 +1,9 @@
+論理エンティティ名,高速道路領収書画像トラン,,,,,,,,,,
+物理エンティティ名,T_HIGHWAY_FEE_RECEIPT_IMAGE,,,,,,,,,,
+論理名,画像No,高速利用料金No.,領収書画像,登録プログラムID,登録日時,登録ユーザID,登録端末IPアドレス,更新プログラム,更新日時,更新ユーザID,更新端末IPアドレス
+物理名,IMAGE_NO,HIGHWAY_FEE_NO,RECEIPT_IMAGE,REGI_PG_ID,REGI_DATETIME,REGI_USER_ID,REGI_TERMINAL_IP_ADDR,UPD_PG_ID,UPD_DATETIME,UPD_USER_ID,UPD_TERMINAL_IP_ADDR
+データ型,*ID共通,*ID共通,*画像共通,@VARCHAR(50),@DATETIME,*ID共通,@VARCHAR(15),@VARCHAR(50),@DATETIME,*ID共通,*ID共通
+Not Null,Yes (PK),,,,,,,,,,
+,1,1,※画像はBlob管理扱いやすい値をDB管理,,,,,,,,
+,2,1,※画像はBlob管理扱いやすい値をDB管理,,,,,,,,
+,3,2,※画像はBlob管理扱いやすい値をDB管理,,,,,,,,

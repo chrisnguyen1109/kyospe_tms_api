@@ -1,0 +1,40 @@
+<body>
+  <style>
+    fieldset.divider {
+      border-top: 1px solid black;
+      border-bottom: none;
+      border-left: none;
+      border-right: none;
+      display: block;
+      text-align: center;
+      width: 700px;
+    }
+
+    fieldset.divider legend {
+      padding: 5px 10px;
+    }
+  </style>
+
+  <p>
+  <div>{{userNm}} 様</div>
+  </p>
+  <p>
+  <div>アカウントの更新が完了いたしました。</div>
+  <div>更新内容をお送りいたします。</div>
+  </p>
+  <br>
+  <fieldset class="divider">
+    <legend>登録内容</legend>
+  </fieldset>
+  <p>お名前：{{userNm}}</p>
+  <p>メールアドレス：{{mailAddress}}</p>
+  <p>ログインID：{{userId}}</p>
+  <p>※画面から設定頂いたパスワードはセキュリティ上表示しておりません。</p>
+  <br>
+  <fieldset class="divider"></fieldset>
+  <br>
+  <p>
+  <div>routeX のご利用は、下記ページからログイン頂けます。</div>
+  <a href="{{url}}">{{url}}</a>
+  </p>
+</body>

@@ -1,0 +1,346 @@
+kind: pipeline  
+type: kubernetes
+name: api
+service_account_name: nm-kys
+
+clone:
+  depth: 2
+
+trigger:
+  branch:
+    - develop
+    - release/*
+    - ci/*
+  event:
+    - custom
+    - push
+    - promote
+
+environment:
+  DOCKER_REPOSITORY: registry.mirabo-global.com/nm-kys/api
+  APP_PATH: apps/api
+  APP_NAME: api
+
+when_stag: &when_stag
+  branch:
+    - release/*
+  event:
+    - promote
+  target:
+    - stag
+
+when_not_stag: &when_not_stag
+  event:
+    exclude:
+    - promote
+
+.build: &build
+  image: gcr.io/kaniko-project/executor:debug
+  commands:
+  - source $DRONE_WORKSPACE/.env_vars
+  - echo "$DOCKER_AUTH_CONFIG" > /kaniko/.docker/config.json
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - KANIKO_BUILD_ARGS="--build-arg VERSION=$VERSION"
+  - KANIKO_CACHE_ARGS="--cache=true --cache-ttl=72h"
+  - /kaniko/executor
+    --context $DRONE_WORKSPACE
+    --dockerfile $DRONE_WORKSPACE/$APP_PATH/Dockerfile 
+    $KANIKO_BUILD_ARGS
+    $KANIKO_CACHE_ARGS
+    --destination $DOCKER_IMAGE
+  environment:
+    DOCKER_AUTH_CONFIG:
+      from_secret: docker_auth_config
+
+.test: &test
+  image: node:18.16-alpine3.17
+  commands:
+  # TODO: cache dependencies
+  - yarn install
+  - yarn test:cov
+
+.deploy: &deploy
+  image: registry.mirabo-global.com/base/k8s-client:1.0.0
+  commands:
+  - source $DRONE_WORKSPACE/.env_vars
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - echo $DOCKER_IMAGE
+  - kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE -n $NAMESPACE
+  - echo "export DEPLOY_STATUS=success" >> $DRONE_WORKSPACE/.env_vars
+
+.deploy_stag: &deploy_stag
+  image: registry.mirabo-global.com/base/k8s-client:1.0.0
+  commands:
+  - source $DRONE_WORKSPACE/.env_vars
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - echo $DOCKER_IMAGE
+  - kubectl set env deployment/$APP_NAME VERSION=$VERSION -n $NAMESPACE
+  - kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE -n $NAMESPACE
+  - echo "export DEPLOY_STATUS=success" >> $DRONE_WORKSPACE/.env_vars
+
+.notify: &notify
+  image: registry.mirabo-global.com/base/googlechat:latest
+  commands:
+  - |
+    source $DRONE_WORKSPACE/.env_vars
+    if [[ "$DEPLOY_STATUS" != "success" ]]; then DEPLOY_STATUS=failure; fi
+    export TEXT="Hi everyone, a new version has been deployed <$DRONE_BUILD_LINK|See details>
+    *$DRONE_REPO_NAME/$APP_NAME* | Version: *$VERSION* | Deploy status: *$DEPLOY_STATUS*"
+  - notify
+  environment:
+    WEBHOOK_URL:
+      from_secret: googlechat_webhook_url
+  when:
+    status:
+    - success
+    - failure
+
+.retag_stag: &retag_stag
+  image: registry.mirabo-global.com/base/crane:debug
+  environment:
+    DOCKER_AUTH_CONFIG:
+      from_secret: docker_auth_config
+  commands: 
+  - mkdir -p /root/.docker
+  - echo "$DOCKER_AUTH_CONFIG" > /root/.docker/config.json
+  - source $DRONE_WORKSPACE/.env_vars
+  
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - echo $DOCKER_IMAGE
+
+  - DOCKER_QA_IMAGE=$(sed  's/stag/qa/' <(echo $DOCKER_IMAGE))
+  - echo $DOCKER_QA_IMAGE
+
+  - echo "crane tag $DOCKER_QA_IMAGE $VERSION_IMAGE"
+  - crane tag $DOCKER_QA_IMAGE $VERSION_IMAGE
+
+steps:
+- name: Prepare
+  image: alpine/git:2.36.3
+  commands:
+  - |
+    [[ "$CI_COMMIT_MESSAGE" =~ "Merge.*from.*release/v.*" ]] && exit 78
+
+    CHANGE=$(git diff HEAD HEAD~1 --name-only)
+    [[ "$CHANGE" =~ "apps/api*" || "$CHANGE" =~ "libs*" ]] && echo "Detected file change." || exit 78
+        
+    > $DRONE_WORKSPACE/.env_vars
+    SEMANTIC_VERSION=$(grep -m 1 '"version"' package.json  | cut -d'"' -f4)
+    SHORT_HASH=$(git rev-parse --short HEAD)
+
+    case "$CI_COMMIT_BRANCH" in
+        develop|ci/*)
+            ENV_CODE=dev
+            ;;
+        release/*)
+            ENV_CODE=qa
+            if [[ "$CI_BUILD_EVENT" == "promote" ]]; then ENV_CODE=stag; fi
+            ;;
+        *)
+            ;;
+    esac
+
+    VERSION="v$SEMANTIC_VERSION-$ENV_CODE+$SHORT_HASH"
+
+    echo "export NAMESPACE=nm-kys-$ENV_CODE" >> $DRONE_WORKSPACE/.env_vars
+    echo "export VERSION=$VERSION" >> $DRONE_WORKSPACE/.env_vars
+    echo "export VERSION_IMAGE=$(echo $VERSION | tr + -)" >> $DRONE_WORKSPACE/.env_vars
+
+# - name: Test
+#   <<: *test
+#   when: *when_not_stag
+
+# - name: Analyze code
+#   image: sonarsource/sonar-scanner-cli:4.7
+#   commands:
+#   # TODO: Cache sonar build
+#   - source $DRONE_WORKSPACE/.env_vars
+#   - sed -i "s|<SONAR_BRANCH_NAME>|$CI_COMMIT_BRANCH|g" sonar-project.properties
+#   - sed -i "s|<SONAR_PROJECT_VERSION>|$VERSION|g" sonar-project.properties
+#   - sonar-scanner -Dsonar.qualitygate.wait=true
+#   environment:
+#     SONAR_TOKEN:
+#       from_secret: sonar_token
+#     SONAR_HOST_URL:
+#       from_secret: sonar_host_url
+#   when: *when_not_stag
+
+- name: Build
+  <<: *build
+  when: *when_not_stag
+
+- name: Deploy
+  <<: *deploy
+  when: *when_not_stag
+
+- name: Retag stag
+  <<: *retag_stag
+  when: *when_stag
+
+- name: Deploy stag
+  <<: *deploy_stag
+  when: *when_stag
+
+- name: Notify
+  <<: *notify
+
+---
+kind: pipeline
+type: kubernetes
+name: batch
+service_account_name: nm-kys
+
+clone:
+  depth: 2
+
+trigger:
+  branch:
+    - develop
+    - release/*
+    - ci/*
+    - feature/*
+  event:
+    - push
+    - promote
+
+when_stag: &when_stag
+  branch:
+    - release/*
+  event:
+    - promote
+  target:
+    - stag
+
+when_not_stag: &when_not_stag
+  event:
+    exclude:
+    - promote
+
+environment:
+  DOCKER_REPOSITORY: registry.mirabo-global.com/nm-kys/batch
+  APP_PATH: apps/batch
+  APP_NAME: batch
+
+.build: &build
+  image: gcr.io/kaniko-project/executor:debug
+  commands:
+  - source $DRONE_WORKSPACE/.env_vars
+  - echo "$DOCKER_AUTH_CONFIG" > /kaniko/.docker/config.json
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - KANIKO_BUILD_ARGS="--build-arg VERSION=$VERSION"
+  - KANIKO_CACHE_ARGS="--cache=true --cache-ttl=72h"
+  - /kaniko/executor
+    --context $DRONE_WORKSPACE
+    --dockerfile $DRONE_WORKSPACE/$APP_PATH/Dockerfile
+    $KANIKO_BUILD_ARGS
+    $KANIKO_CACHE_ARGS
+    --destination $DOCKER_IMAGE
+  environment:
+    DOCKER_AUTH_CONFIG:
+      from_secret: docker_auth_config
+
+.deploy: &deploy
+  image: registry.mirabo-global.com/base/k8s-client:1.0.0
+  commands:
+  - source $DRONE_WORKSPACE/.env_vars
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - echo $DOCKER_IMAGE
+  - kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE -n $NAMESPACE
+  - echo "export DEPLOY_STATUS=success" >> $DRONE_WORKSPACE/.env_vars
+
+.notify: &notify
+  image: registry.mirabo-global.com/base/googlechat:latest
+  commands:
+  - |
+    source $DRONE_WORKSPACE/.env_vars
+    if [[ "$DEPLOY_STATUS" != "success" ]]; then DEPLOY_STATUS=failure; fi
+    export TEXT="Hi everyone, a new version has been deployed <$DRONE_BUILD_LINK|See details>
+    *$DRONE_REPO_NAME/$APP_NAME* | Version: *$VERSION* | Deploy status: *$DEPLOY_STATUS*"
+  - notify
+  environment:
+    WEBHOOK_URL:
+      from_secret: googlechat_webhook_url
+  when:
+    status:
+    - success
+    - failure
+
+.retag_stag: &retag_stag
+  image: registry.mirabo-global.com/base/crane:debug
+  environment:
+    DOCKER_AUTH_CONFIG:
+      from_secret: docker_auth_config
+  commands: 
+  - mkdir -p /root/.docker
+  - echo "$DOCKER_AUTH_CONFIG" > /root/.docker/config.json
+  - source $DRONE_WORKSPACE/.env_vars
+  
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - echo $DOCKER_IMAGE
+
+  - DOCKER_QA_IMAGE=$(sed 's/stag/qa/' <(echo $DOCKER_IMAGE))
+  - echo $DOCKER_QA_IMAGE
+
+  - echo "crane tag $DOCKER_QA_IMAGE $VERSION_IMAGE"
+  - crane tag $DOCKER_QA_IMAGE $VERSION_IMAGE
+
+.deploy_stag: &deploy_stag
+  image: registry.mirabo-global.com/base/k8s-client:1.0.0
+  commands:
+  - source $DRONE_WORKSPACE/.env_vars
+  - DOCKER_IMAGE="$DOCKER_REPOSITORY:$VERSION_IMAGE"
+  - echo $DOCKER_IMAGE
+  - kubectl set env deployment/$APP_NAME VERSION=$VERSION -n $NAMESPACE
+  - kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE -n $NAMESPACE
+  - echo "export DEPLOY_STATUS=success" >> $DRONE_WORKSPACE/.env_vars
+
+steps:
+- name: Prepare
+  image: alpine/git:2.36.3
+  commands:
+  - |
+    [[ "$CI_COMMIT_MESSAGE" =~ "Merge.*from.*release/v.*" ]] && exit 78
+
+    CHANGE=$(git diff HEAD HEAD~1 --name-only)
+    [[ "$CHANGE" =~ "apps/batch*" || "$CHANGE" =~ "libs*" ]] && echo "Detected file change." || exit 78
+    
+    > $DRONE_WORKSPACE/.env_vars
+    SEMANTIC_VERSION=$(grep -m 1 '"version"' package.json  | cut -d'"' -f4)
+    SHORT_HASH=$(git rev-parse --short HEAD)
+
+    case "$CI_COMMIT_BRANCH" in
+        develop|ci/*)
+            ENV_CODE=dev
+            ;;
+        main|release/*)
+            ENV_CODE=qa
+            if [[ "$CI_BUILD_EVENT" == "promote" ]]; then ENV_CODE=stag; fi
+            ;;
+        *)
+            ;;
+    esac
+
+    VERSION="v$SEMANTIC_VERSION-$ENV_CODE+$SHORT_HASH"
+
+    echo "export NAMESPACE=nm-kys-$ENV_CODE" >> $DRONE_WORKSPACE/.env_vars
+    echo "export VERSION=$VERSION" >> $DRONE_WORKSPACE/.env_vars
+    echo "export VERSION_IMAGE=$(echo $VERSION | tr + -)" >> $DRONE_WORKSPACE/.env_vars
+
+- name: Build
+  <<: *build
+  when: *when_not_stag
+
+- name: Deploy
+  <<: *deploy
+  when: *when_not_stag
+
+- name: Retag stag
+  <<: *retag_stag
+  when: *when_stag
+
+- name: Deploy stag
+  <<: *deploy_stag
+  when: *when_stag
+
+- name: Notify
+  <<: *notify
